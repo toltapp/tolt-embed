@@ -125,11 +125,15 @@ function buildSrc(
     for (const key of THEME_KEYS) {
       const value = themeOptions[key];
       if (value === undefined || value === null || value === "") continue;
-      params.set(key, String(value));
+      params.set(key, key === "radius" && typeof value === "number" ? `${value}px` : String(value));
     }
   }
   const query = params.toString();
-  return query ? `${target}?${query}` : target;
+  if (!query) return target;
+  const hashIndex = target.indexOf("#");
+  const base = hashIndex === -1 ? target : target.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? "" : target.slice(hashIndex);
+  return `${base}${base.includes("?") ? "&" : "?"}${query}${hash}`;
 }
 
 function safeOrigin(baseUrl: string) {
