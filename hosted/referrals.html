@@ -147,6 +147,12 @@
   .card.is-empty .spark, .card.is-empty #refsHead, .card.is-empty #refs { display: none; }
   .card.is-empty .empty { display: block; }
 
+  .error-msg { display: none; text-align: center; padding: 30px 16px 14px; }
+  .error-msg .title { font-family: var(--display); font-weight: 700; font-size: 15px; }
+  .error-msg .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .card.is-error > :not(.error-msg) { display: none; }
+  .card.is-error .error-msg { display: block; }
+
   @keyframes tolt-shimmer { 0% { background-position: -450px 0; } 100% { background-position: 450px 0; } }
   .card.is-loading #pname,
   .card.is-loading #pemail,
@@ -198,7 +204,7 @@
         <div class="subearn">
           <div>Pending<b id="pending">$640.00</b></div>
           <div>Paid out<b id="paid">$4,180.00</b></div>
-          <div>Next payout<b id="nextpayout">Sep 1</b></div>
+          <div id="nextpayoutwrap">Next payout<b id="nextpayout">Sep 1</b></div>
         </div>
       </div>
       <svg id="spark" class="spark" viewBox="0 0 260 76" preserveAspectRatio="none" aria-hidden="true">
@@ -260,7 +266,12 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       </div>
       <div class="title">Share your link to start earning</div>
-      <div class="sub">Send the link above to a friend. You'll earn 20% of every payment they make.</div>
+      <div class="sub">Send the link above to a friend. You'll earn a commission on every payment they make.</div>
+    </div>
+
+    <div class="error-msg">
+      <div class="title">Couldn't load your dashboard</div>
+      <div class="sub">Please refresh to try again.</div>
     </div>
 
     <a class="foot" id="foot" href="https://tolt.com" target="_blank" rel="noopener noreferrer">Referrals by <b>Tolt</b></a>
@@ -341,6 +352,12 @@
           return "<tr><td class='cust'>" + mask(r.customerEmail) + "<div class='date'>" + day(r.createdAt) + "</div></td><td><span class='badge " + cls + "'>" + badge + "</span></td><td class='amt'>+" + usd(r.amount) + "</td></tr>";
         }).join("");
       }
+      var np = document.getElementById("nextpayoutwrap"); if (np) np.style.display = "none";
+      var earned = Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid);
+      var recent = d.recentCommissions && d.recentCommissions.length;
+      if (!recent && earned === 0 && Number(d.stats.clicks) === 0) {
+        document.getElementById("card").classList.add("is-empty");
+      }
     }
 
     function postHeight() {
@@ -355,16 +372,28 @@
       refs.innerHTML = r + r + r + r;
     }
 
+    function showError() {
+      document.getElementById("card").classList.remove("is-loading");
+      document.getElementById("card").classList.add("is-error");
+    }
+
     var token = params.get("token");
-    var api = params.get("api");
-    if (token && api) {
-      var card = document.getElementById("card");
-      card.classList.add("is-loading");
+    var api = params.get("api") || "https://api.tolt.com";
+    if (token) {
+      document.getElementById("card").classList.add("is-loading");
       skeletonRows();
       fetch(api.replace(/\/$/, "") + "/embed/referrals", { headers: { Authorization: "Bearer " + token } })
-        .then(function (r) { return r.json(); })
-        .then(function (res) { card.classList.remove("is-loading"); if (res && res.data) hydrate(res.data); postHeight(); })
-        .catch(function () { card.classList.remove("is-loading"); postHeight(); });
+        .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+        .then(function (res) {
+          if (res && res.data) {
+            document.getElementById("card").classList.remove("is-loading");
+            hydrate(res.data);
+          } else {
+            showError();
+          }
+          postHeight();
+        })
+        .catch(function () { showError(); postHeight(); });
     }
 
     window.addEventListener("load", postHeight);
