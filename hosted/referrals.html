@@ -147,8 +147,36 @@
   .card.is-empty .spark, .card.is-empty #refsHead, .card.is-empty #refs { display: none; }
   .card.is-empty .empty { display: block; }
 
-  .foot { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; color: var(--muted); font-size: 12px; }
-  .foot .mark { width: 14px; height: 14px; border-radius: 4px; background: var(--text); display: inline-block; }
+  .error-msg { display: none; text-align: center; padding: 30px 16px 14px; }
+  .error-msg .title { font-family: var(--display); font-weight: 700; font-size: 15px; }
+  .error-msg .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .card.is-error > :not(.error-msg) { display: none; }
+  .card.is-error .error-msg { display: block; }
+
+  @keyframes tolt-shimmer { 0% { background-position: -450px 0; } 100% { background-position: 450px 0; } }
+  .card.is-loading #pname,
+  .card.is-loading #pemail,
+  .card.is-loading .earn .total .value,
+  .card.is-loading .subearn b,
+  .card.is-loading .field span,
+  .card.is-loading .stat .value,
+  .card.is-loading #avatar {
+    color: transparent !important;
+    background: linear-gradient(90deg, var(--card) 8%, var(--line) 22%, var(--card) 36%);
+    background-size: 900px 100%;
+    animation: tolt-shimmer 1.3s linear infinite;
+    border-radius: 6px;
+  }
+  .card.is-loading #avatar { border-radius: 50%; }
+  .card.is-loading .earn .total .value * { color: transparent !important; }
+  .card.is-loading #ratechip,
+  .card.is-loading #spark { visibility: hidden; }
+  .sk-bar { display: block; height: 11px; border-radius: 6px; background: linear-gradient(90deg, var(--card) 8%, var(--line) 22%, var(--card) 36%); background-size: 900px 100%; animation: tolt-shimmer 1.3s linear infinite; }
+  .sk-pill { display: inline-block; width: 60px; height: 20px; border-radius: 999px; background: linear-gradient(90deg, var(--card) 8%, var(--line) 22%, var(--card) 36%); background-size: 900px 100%; animation: tolt-shimmer 1.3s linear infinite; }
+
+  .foot { display: block; text-align: center; margin-top: 20px; color: var(--muted); font-size: 12px; text-decoration: none; }
+  .foot b { color: var(--text); font-weight: 700; }
+  .foot:hover b { text-decoration: underline; }
   @media (max-width: 560px) {
     .earn { grid-template-columns: 1fr; }
     .stats { grid-template-columns: repeat(2, 1fr); }
@@ -160,13 +188,13 @@
   <div class="card" id="card">
     <div class="row between head">
       <div class="row">
-        <div class="avatar">JC</div>
+        <div class="avatar" id="avatar">JC</div>
         <div class="who">
-          <div class="name">Jane Cooper</div>
-          <div class="email">jane@acme.com</div>
+          <div class="name" id="pname">Jane Cooper</div>
+          <div class="email" id="pemail">jane@acme.com</div>
         </div>
       </div>
-      <div class="chip"><b>20%</b> recurring</div>
+      <div class="chip" id="ratechip"><b>20%</b> recurring</div>
     </div>
 
     <div class="earn">
@@ -176,7 +204,7 @@
         <div class="subearn">
           <div>Pending<b id="pending">$640.00</b></div>
           <div>Paid out<b id="paid">$4,180.00</b></div>
-          <div>Next payout<b id="nextpayout">Sep 1</b></div>
+          <div id="nextpayoutwrap">Next payout<b id="nextpayout">Sep 1</b></div>
         </div>
       </div>
       <svg id="spark" class="spark" viewBox="0 0 260 76" preserveAspectRatio="none" aria-hidden="true">
@@ -238,46 +266,137 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       </div>
       <div class="title">Share your link to start earning</div>
-      <div class="sub">Send the link above to a friend. You'll earn 20% of every payment they make.</div>
+      <div class="sub">Send the link above to a friend. You'll earn a commission on every payment they make.</div>
     </div>
 
-    <div class="foot"><span class="mark"></span> Powered by Tolt</div>
+    <div class="error-msg">
+      <div class="title">Couldn't load your dashboard</div>
+      <div class="sub">Please refresh to try again.</div>
+    </div>
+
+    <a class="foot" id="foot" href="https://tolt.com" target="_blank" rel="noopener noreferrer">Referrals by <b>Tolt</b></a>
   </div>
 
 <script>
   (function () {
     var params = new URLSearchParams(location.search);
+    var set = function (id, v) { var el = document.getElementById(id); if (el != null) el.textContent = v; };
+
     var theme = params.get("theme");
-    if (theme === "dark" || theme === "light") {
-      document.documentElement.setAttribute("data-theme", theme);
-    }
+    if (theme === "dark" || theme === "light") document.documentElement.setAttribute("data-theme", theme);
     var brand = params.get("brandColor");
     if (brand) document.documentElement.style.setProperty("--brand", brand);
     var ink = params.get("brandTextColor");
     if (ink) document.documentElement.style.setProperty("--brand-ink", ink);
 
-    var link = document.getElementById("link").textContent;
-    var btn = document.getElementById("copy");
     var label = document.getElementById("copytext");
-    btn.addEventListener("click", function () {
-      navigator.clipboard && navigator.clipboard.writeText("https://" + link);
+    document.getElementById("copy").addEventListener("click", function () {
+      var url = "https://" + document.getElementById("link").textContent;
+      if (navigator.clipboard) navigator.clipboard.writeText(url);
       label.textContent = "Copied";
       setTimeout(function () { label.textContent = "Copy"; }, 1400);
     });
 
     if (params.get("state") === "empty") {
-      var card = document.getElementById("card");
-      card.classList.add("is-empty");
-      var set = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
+      document.getElementById("card").classList.add("is-empty");
       set("total", "$0"); set("totalCents", ".00");
       set("pending", "$0.00"); set("paid", "$0.00"); set("nextpayout", "—");
       set("clicks", "0"); set("signups", "0"); set("customers", "0"); set("conv", "—");
+    }
+
+    function usd(c) { return "$" + (Number(c) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function money(c) { var s = usd(c); var d = s.lastIndexOf("."); return [s.slice(0, d), s.slice(d)]; }
+    function mask(e) { if (!e || e.indexOf("@") < 0) return "a customer"; var p = e.split("@"); return p[0].slice(0, 1) + "•••@" + p[1]; }
+    function day(d) { return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
+    function initials(name, email) { var p = (name || "").trim().split(/\s+/); var a = (p[0] || email || "?")[0] || "?"; var b = p[1] ? p[1][0] : ""; return (a + b).toUpperCase(); }
+    function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+    function drawSpark(series) {
+      var spark = document.getElementById("spark");
+      if (!spark) return;
+      var vals = (series || []).map(Number);
+      if (vals.length < 2) { spark.style.visibility = "hidden"; return; }
+      spark.style.visibility = "";
+      var cum = [], t = 0;
+      for (var i = 0; i < vals.length; i++) { t += vals[i]; cum.push(t); }
+      var max = Math.max.apply(null, cum) || 1;
+      var W = 260, H = 76, n = cum.length, pts = [];
+      for (var j = 0; j < n; j++) pts.push([(j / (n - 1)) * W, H - 6 - (cum[j] / max) * (H - 14)]);
+      var line = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ");
+      var area = "M" + pts[0][0].toFixed(1) + "," + H + " " + pts.map(function (p) { return "L" + p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ") + " L" + W + "," + H + " Z";
+      var paths = spark.querySelectorAll("path");
+      if (paths[0]) paths[0].setAttribute("d", area);
+      if (paths[1]) paths[1].setAttribute("d", line);
+    }
+
+    function hydrate(d) {
+      var name = [d.partner.firstName, d.partner.lastName].filter(Boolean).join(" ").trim() || d.partner.email;
+      set("pname", name);
+      set("pemail", d.partner.email);
+      set("avatar", initials(name, d.partner.email));
+      var chip = document.getElementById("ratechip"); if (chip) chip.style.display = "none";
+      if (d.link && d.link.url) set("link", d.link.url.replace(/^https?:\/\//, ""));
+      var tot = money(Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid));
+      set("total", tot[0]); set("totalCents", tot[1]);
+      set("pending", usd(d.earnings.pending));
+      set("paid", usd(d.earnings.paid));
+      set("clicks", Number(d.stats.clicks).toLocaleString("en-US"));
+      set("signups", Number(d.stats.leads).toLocaleString("en-US"));
+      set("customers", Number(d.stats.customers).toLocaleString("en-US"));
+      set("conv", Number(d.stats.conversionRate).toFixed(1) + "%");
+      drawSpark(d.series);
+      var refs = document.getElementById("refs");
+      if (refs) {
+        refs.innerHTML = (d.recentCommissions || []).map(function (r) {
+          var badge = r.status === "paid" ? "Paid" : r.status === "approved" ? "Approved" : r.status === "pending" ? "Pending" : (r.status || "");
+          var cls = (r.status === "paid" || r.status === "approved") ? "paid" : "pending";
+          return "<tr><td class='cust'>" + esc(mask(r.customerEmail)) + "<div class='date'>" + esc(day(r.createdAt)) + "</div></td><td><span class='badge " + cls + "'>" + esc(badge) + "</span></td><td class='amt'>+" + esc(usd(r.amount)) + "</td></tr>";
+        }).join("");
+      }
+      var np = document.getElementById("nextpayoutwrap"); if (np) np.style.display = "none";
+      var earned = Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid);
+      var recent = d.recentCommissions && d.recentCommissions.length;
+      if (!recent && earned === 0 && Number(d.stats.clicks) === 0) {
+        document.getElementById("card").classList.add("is-empty");
+      }
     }
 
     function postHeight() {
       var h = document.getElementById("card").getBoundingClientRect().height + 8;
       parent.postMessage({ type: "tolt-embed:resize", height: Math.ceil(h) }, "*");
     }
+
+    function skeletonRows() {
+      var refs = document.getElementById("refs");
+      if (!refs) return;
+      var r = "<tr><td><span class='sk-bar' style='width:150px; height:13px'></span><span class='sk-bar' style='width:78px; height:13px; margin-top:11px'></span></td><td><span class='sk-pill'></span></td><td style='text-align:right'><span class='sk-bar' style='width:56px; height:13px; margin-left:auto'></span></td></tr>";
+      refs.innerHTML = r + r + r + r;
+    }
+
+    function showError() {
+      document.getElementById("card").classList.remove("is-loading");
+      document.getElementById("card").classList.add("is-error");
+      postHeight();
+      parent.postMessage({ type: "tolt-embed:error", message: "Failed to load the dashboard" }, "*");
+    }
+
+    var token = params.get("token");
+    var api = params.get("api") || "https://api.tolt.com";
+    if (token) {
+      document.getElementById("card").classList.add("is-loading");
+      skeletonRows();
+      fetch(api.replace(/\/$/, "") + "/embed/referrals", { headers: { Authorization: "Bearer " + token } })
+        .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+        .then(function (res) {
+          if (!res || !res.data) { showError(); return; }
+          document.getElementById("card").classList.remove("is-loading");
+          hydrate(res.data);
+          postHeight();
+          parent.postMessage({ type: "tolt-embed:ready" }, "*");
+        })
+        .catch(function () { showError(); });
+    }
+
     window.addEventListener("load", postHeight);
     window.addEventListener("resize", postHeight);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(postHeight);
