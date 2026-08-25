@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
 export type ToltEmbedTheme = "light" | "dark" | "system";
@@ -36,11 +36,13 @@ export function ToltEmbed({
   onError,
 }: ToltEmbedProps) {
   const [height, setHeight] = useState(0);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const origin = safeOrigin(baseUrl);
 
   useEffect(() => {
     function onMessage(event: MessageEvent) {
       if (origin && event.origin !== origin) return;
+      if (iframeRef.current && event.source !== iframeRef.current.contentWindow) return;
       const msg = event.data as { type?: string; height?: number; message?: string };
       if (!msg || typeof msg !== "object") return;
       if (msg.type === "tolt-embed:resize" && typeof msg.height === "number") {
@@ -57,6 +59,7 @@ export function ToltEmbed({
 
   return (
     <iframe
+      ref={iframeRef}
       src={buildSrc(baseUrl, data, token, theme, themeOptions)}
       title="Tolt referral dashboard"
       className={className}
