@@ -45,6 +45,7 @@ export function ToltEmbed({
       if (!msg || typeof msg !== "object") return;
       if (msg.type === "tolt-embed:resize" && typeof msg.height === "number") {
         setHeight(msg.height);
+      } else if (msg.type === "tolt-embed:ready") {
         onReady?.();
       } else if (msg.type === "tolt-embed:error") {
         onError?.(typeof msg.message === "string" ? msg.message : "Embed failed to load");

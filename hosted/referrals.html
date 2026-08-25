@@ -375,6 +375,8 @@
     function showError() {
       document.getElementById("card").classList.remove("is-loading");
       document.getElementById("card").classList.add("is-error");
+      postHeight();
+      parent.postMessage({ type: "tolt-embed:error", message: "Failed to load the dashboard" }, "*");
     }
 
     var token = params.get("token");
@@ -385,15 +387,13 @@
       fetch(api.replace(/\/$/, "") + "/embed/referrals", { headers: { Authorization: "Bearer " + token } })
         .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
         .then(function (res) {
-          if (res && res.data) {
-            document.getElementById("card").classList.remove("is-loading");
-            hydrate(res.data);
-          } else {
-            showError();
-          }
+          if (!res || !res.data) { showError(); return; }
+          document.getElementById("card").classList.remove("is-loading");
+          hydrate(res.data);
           postHeight();
+          parent.postMessage({ type: "tolt-embed:ready" }, "*");
         })
-        .catch(function () { showError(); postHeight(); });
+        .catch(function () { showError(); });
     }
 
     window.addEventListener("load", postHeight);
