@@ -309,6 +309,7 @@
     function mask(e) { if (!e || e.indexOf("@") < 0) return "a customer"; var p = e.split("@"); return p[0].slice(0, 1) + "•••@" + p[1]; }
     function day(d) { return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
     function initials(name, email) { var p = (name || "").trim().split(/\s+/); var a = (p[0] || email || "?")[0] || "?"; var b = p[1] ? p[1][0] : ""; return (a + b).toUpperCase(); }
+    function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
     function drawSpark(series) {
       var spark = document.getElementById("spark");
@@ -335,7 +336,7 @@
       set("avatar", initials(name, d.partner.email));
       var chip = document.getElementById("ratechip"); if (chip) chip.style.display = "none";
       if (d.link && d.link.url) set("link", d.link.url.replace(/^https?:\/\//, ""));
-      var tot = money(Number(d.earnings.approved) + Number(d.earnings.paid));
+      var tot = money(Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid));
       set("total", tot[0]); set("totalCents", tot[1]);
       set("pending", usd(d.earnings.pending));
       set("paid", usd(d.earnings.paid));
@@ -349,7 +350,7 @@
         refs.innerHTML = (d.recentCommissions || []).map(function (r) {
           var badge = r.status === "paid" ? "Paid" : r.status === "approved" ? "Approved" : r.status === "pending" ? "Pending" : (r.status || "");
           var cls = (r.status === "paid" || r.status === "approved") ? "paid" : "pending";
-          return "<tr><td class='cust'>" + mask(r.customerEmail) + "<div class='date'>" + day(r.createdAt) + "</div></td><td><span class='badge " + cls + "'>" + badge + "</span></td><td class='amt'>+" + usd(r.amount) + "</td></tr>";
+          return "<tr><td class='cust'>" + esc(mask(r.customerEmail)) + "<div class='date'>" + esc(day(r.createdAt)) + "</div></td><td><span class='badge " + cls + "'>" + esc(badge) + "</span></td><td class='amt'>+" + esc(usd(r.amount)) + "</td></tr>";
         }).join("");
       }
       var np = document.getElementById("nextpayoutwrap"); if (np) np.style.display = "none";
