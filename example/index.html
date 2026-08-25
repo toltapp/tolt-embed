@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Northwind — Refer &amp; earn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --page: #fbfbfc;
+    --panel: #ffffff;
+    --text: #101319;
+    --muted: #6b7280;
+    --line: #ecedf0;
+    --accent: #4f46e5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--text);
+    font-family: "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    height: 56px; border-bottom: 1px solid var(--line); background: var(--panel);
+    display: flex; align-items: center; gap: 22px; padding: 0 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15px; }
+  .brand .logo { width: 22px; height: 22px; border-radius: 7px; background: linear-gradient(135deg, #6366f1, #4338ca); }
+  .nav { display: flex; gap: 20px; font-size: 13.5px; color: var(--muted); }
+  .nav .active { color: var(--text); font-weight: 600; }
+  .nav span { cursor: default; }
+  .me { margin-left: auto; width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb; }
+
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 64px; }
+  .eyebrow { color: var(--accent); font-weight: 600; font-size: 13px; letter-spacing: .01em; }
+  h1 { font-size: 27px; letter-spacing: -0.02em; margin: 8px 0 8px; }
+  .lede { color: var(--muted); font-size: 15px; max-width: 60ch; margin: 0 0 28px; line-height: 1.55; }
+
+  .embed { }
+  iframe { display: block; width: 100%; border: none; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><span class="logo"></span> Northwind</div>
+    <nav class="nav">
+      <span>Dashboard</span>
+      <span>Projects</span>
+      <span>Billing</span>
+      <span class="active">Refer &amp; earn</span>
+    </nav>
+    <div class="me"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="eyebrow">Refer &amp; earn</div>
+    <h1>Share Northwind, earn 20% forever</h1>
+    <p class="lede">Send friends your link. When they subscribe, you earn 20% of their payment every month for as long as they stay. Track it all right here.</p>
+
+    <div class="embed">
+      <iframe id="tolt" src="http://127.0.0.1:4599/hosted/referrals.html?theme=light&brandColor=%234f46e5&brandTextColor=%23ffffff" title="Referral dashboard" height="520" allow="clipboard-write"></iframe>
+    </div>
+  </div>
+
+<script>
+  // This mirrors what <ToltEmbed> does: listen for the iframe's size and grow to fit.
+  var frame = document.getElementById("tolt");
+  var origin = new URL(frame.src).origin;
+  window.addEventListener("message", function (e) {
+    if (e.origin !== origin) return;
+    if (e.data && e.data.type === "tolt-embed:resize" && typeof e.data.height === "number") {
+      frame.style.height = e.data.height + "px";
+    }
+  });
+</script>
+</body>
+</html>
