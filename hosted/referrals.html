@@ -108,14 +108,14 @@
   .linkbar { display: flex; gap: 8px; margin-bottom: 20px; }
   .linkbar .field {
     flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
-    background: var(--card); border: 1px solid var(--line); border-radius: calc(var(--r) - 6px);
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r-xs, 10px);
     padding: 0 12px; height: 40px; font-size: 13.5px; color: var(--text);
     font-variant-numeric: tabular-nums;
   }
   .linkbar .field span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .linkbar .field .globe { color: var(--muted); flex: none; }
   .copy {
-    height: 40px; padding: 0 16px; border-radius: calc(var(--r) - 6px); border: 1px solid transparent;
+    height: 40px; padding: 0 16px; border-radius: var(--r-xs, 10px); border: 1px solid transparent;
     background: var(--brand); color: var(--brand-ink);
     font-family: var(--sans); font-weight: 600; font-size: 13.5px; cursor: pointer;
     display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
@@ -125,7 +125,7 @@
   .copy:active { transform: translateY(1px); }
 
   .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
-  .stat { background: var(--card); border: 1px solid var(--line); border-radius: calc(var(--r) - 4px); padding: 12px 13px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm, 12px); padding: 12px 13px; }
   .stat .value { font-family: var(--display); font-weight: 700; font-size: 19px; margin-top: 5px; font-variant-numeric: tabular-nums; }
 
   .sec { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 0 0 10px; }
@@ -309,6 +309,14 @@
       if (key === "radius" && /^[0-9]+(\.[0-9]+)?$/.test(value)) value = value + "px";
       if (canValidate && !CSS.supports(spec.prop, value)) return;
       document.documentElement.style.setProperty(spec.name, value);
+      if (key === "radius") {
+        var single = /^([0-9]+(?:\.[0-9]+)?)px$/.exec(value);
+        if (single) {
+          var n = parseFloat(single[1]);
+          document.documentElement.style.setProperty("--r-sm", Math.max(0, n - 4) + "px");
+          document.documentElement.style.setProperty("--r-xs", Math.max(0, n - 6) + "px");
+        }
+      }
     });
 
     var label = document.getElementById("copytext");
@@ -417,6 +425,11 @@
           parent.postMessage({ type: "tolt-embed:ready" }, "*");
         })
         .catch(function () { showError(); });
+    } else {
+      window.addEventListener("load", function () {
+        postHeight();
+        parent.postMessage({ type: "tolt-embed:ready" }, "*");
+      });
     }
 
     window.addEventListener("load", postHeight);
