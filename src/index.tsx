@@ -3,16 +3,43 @@ import type { CSSProperties } from "react";
 
 export type ToltEmbedTheme = "light" | "dark" | "system";
 
+/**
+ * Recolor and reshape the dashboard to match your app. Every field is optional;
+ * anything you leave out keeps the Tolt default for the active `theme`.
+ */
+export type ToltEmbedThemeOptions = {
+  /** Accent: the copy button, links, and the earnings sparkline. */
+  brandColor?: string;
+  /** Text and icons that sit on top of `brandColor`. */
+  brandTextColor?: string;
+  /** The dashboard card surface. */
+  backgroundColor?: string;
+  /** Raised tiles inside the card: the stats and the referral-link field. */
+  surfaceColor?: string;
+  /** Primary text. */
+  textColor?: string;
+  /** Secondary text and labels. */
+  mutedColor?: string;
+  /** Hairline borders and dividers. */
+  borderColor?: string;
+  /** Corner radius. A number is treated as pixels; a string is used as-is. */
+  radius?: number | string;
+  /** Body font stack. */
+  fontFamily?: string;
+  /** Heading font stack. */
+  headingFontFamily?: string;
+};
+
 export type ToltEmbedProps = {
-  /** The public embed token minted on your server for a specific partner. */
-  token: string;
+  /** The public embed token minted on your server for a specific partner. Omit to render a sample dashboard. */
+  token?: string;
   /** Which embed to render. Only the referral dashboard exists today. */
   data?: "referrals";
   /** Force a theme, or follow the partner's system setting (default). */
   theme?: ToltEmbedTheme;
   /** Match the widget to your brand. */
-  themeOptions?: { brandColor?: string; brandTextColor?: string };
-  /** Override the embed host (mostly for local development). */
+  themeOptions?: ToltEmbedThemeOptions;
+  /** Override the embed host, or point straight at a hosted `.html` file (mostly for local development). */
   baseUrl?: string;
   className?: string;
   style?: CSSProperties;
@@ -23,6 +50,19 @@ export type ToltEmbedProps = {
 };
 
 const DEFAULT_BASE_URL = "https://embed.tolt.com";
+
+const THEME_KEYS: (keyof ToltEmbedThemeOptions)[] = [
+  "brandColor",
+  "brandTextColor",
+  "backgroundColor",
+  "surfaceColor",
+  "textColor",
+  "mutedColor",
+  "borderColor",
+  "radius",
+  "fontFamily",
+  "headingFontFamily",
+];
 
 export function ToltEmbed({
   token,
@@ -72,16 +112,28 @@ export function ToltEmbed({
 function buildSrc(
   baseUrl: string,
   data: string,
-  token: string,
+  token: string | undefined,
   theme: ToltEmbedTheme,
-  themeOptions?: ToltEmbedProps["themeOptions"],
+  themeOptions?: ToltEmbedThemeOptions,
 ) {
-  const url = new URL(`${baseUrl.replace(/\/$/, "")}/${data}`);
-  url.searchParams.set("token", token);
-  if (theme !== "system") url.searchParams.set("theme", theme);
-  if (themeOptions?.brandColor) url.searchParams.set("brandColor", themeOptions.brandColor);
-  if (themeOptions?.brandTextColor) url.searchParams.set("brandTextColor", themeOptions.brandTextColor);
-  return url.toString();
+  const trimmed = baseUrl.replace(/\/$/, "");
+  const target = /\.html?(\?|#|$)/i.test(trimmed) ? trimmed : `${trimmed}/${data}`;
+  const params = new URLSearchParams();
+  if (token) params.set("token", token);
+  if (theme !== "system") params.set("theme", theme);
+  if (themeOptions) {
+    for (const key of THEME_KEYS) {
+      const value = themeOptions[key];
+      if (value === undefined || value === null || value === "") continue;
+      params.set(key, key === "radius" && typeof value === "number" ? `${value}px` : String(value));
+    }
+  }
+  const query = params.toString();
+  if (!query) return target;
+  const hashIndex = target.indexOf("#");
+  const base = hashIndex === -1 ? target : target.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? "" : target.slice(hashIndex);
+  return `${base}${base.includes("?") ? "&" : "?"}${query}${hash}`;
 }
 
 function safeOrigin(baseUrl: string) {
