@@ -234,7 +234,7 @@
       </button>
     </div>
 
-    <div class="stats">
+    <div class="stats" id="statsgrid">
       <div class="stat"><div class="label">Clicks</div><div class="value" id="clicks">1,284</div></div>
       <div class="stat"><div class="label">Signups</div><div class="value" id="signups">96</div></div>
       <div class="stat"><div class="label">Customers</div><div class="value" id="customers">38</div></div>
@@ -370,10 +370,15 @@
       set("total", tot[0]); set("totalCents", tot[1]);
       set("pending", usd(d.earnings.pending));
       set("paid", usd(d.earnings.paid));
-      set("clicks", Number(d.stats.clicks).toLocaleString("en-US"));
-      set("signups", Number(d.stats.leads).toLocaleString("en-US"));
-      set("customers", Number(d.stats.customers).toLocaleString("en-US"));
-      set("conv", Number(d.stats.conversionRate).toFixed(1) + "%");
+      if (d.stats) {
+        set("clicks", Number(d.stats.clicks).toLocaleString("en-US"));
+        set("signups", Number(d.stats.leads).toLocaleString("en-US"));
+        set("customers", Number(d.stats.customers).toLocaleString("en-US"));
+        set("conv", Number(d.stats.conversionRate).toFixed(1) + "%");
+      } else {
+        var sg = document.getElementById("statsgrid");
+        if (sg) sg.style.display = "none";
+      }
       drawSpark(d.series);
       var refs = document.getElementById("refs");
       if (refs) {
@@ -386,7 +391,7 @@
       var np = document.getElementById("nextpayoutwrap"); if (np) np.style.display = "none";
       var earned = Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid);
       var recent = d.recentCommissions && d.recentCommissions.length;
-      if (!recent && earned === 0 && Number(d.stats.clicks) === 0) {
+      if (!recent && earned === 0 && d.stats && Number(d.stats.clicks) === 0) {
         document.getElementById("card").classList.add("is-empty");
       }
     }
