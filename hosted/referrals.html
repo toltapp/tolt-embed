@@ -391,7 +391,7 @@
       var np = document.getElementById("nextpayoutwrap"); if (np) np.style.display = "none";
       var earned = Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid);
       var recent = d.recentCommissions && d.recentCommissions.length;
-      if (!recent && earned === 0 && (!d.stats || Number(d.stats.clicks) === 0)) {
+      if (!recent && earned === 0 && d.stats && Number(d.stats.clicks) === 0) {
         document.getElementById("card").classList.add("is-empty");
       }
     }
