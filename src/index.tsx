@@ -49,7 +49,7 @@ export type ToltEmbedProps = {
   onError?: (message: string) => void;
 };
 
-const DEFAULT_BASE_URL = "https://embed.tolt.com";
+const DEFAULT_BASE_URL = "https://platform.tolt.com";
 
 const THEME_KEYS: (keyof ToltEmbedThemeOptions)[] = [
   "brandColor",
