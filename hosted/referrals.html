@@ -360,7 +360,7 @@
     }
 
     function hydrate(d) {
-      var name = [d.partner.firstName, d.partner.lastName].filter(Boolean).join(" ").trim() || d.partner.email;
+      var name = [d.partner.first_name, d.partner.last_name].filter(Boolean).join(" ").trim() || d.partner.email;
       set("pname", name);
       set("pemail", d.partner.email);
       set("avatar", initials(name, d.partner.email));
@@ -374,7 +374,7 @@
         set("clicks", Number(d.stats.clicks).toLocaleString("en-US"));
         set("signups", Number(d.stats.leads).toLocaleString("en-US"));
         set("customers", Number(d.stats.customers).toLocaleString("en-US"));
-        set("conv", Number(d.stats.conversionRate).toFixed(1) + "%");
+        set("conv", Number(d.stats.conversion_rate).toFixed(1) + "%");
       } else {
         var sg = document.getElementById("statsgrid");
         if (sg) sg.style.display = "none";
@@ -382,15 +382,15 @@
       drawSpark(d.series);
       var refs = document.getElementById("refs");
       if (refs) {
-        refs.innerHTML = (d.recentCommissions || []).map(function (r) {
+        refs.innerHTML = (d.recent_commissions || []).map(function (r) {
           var badge = r.status === "paid" ? "Paid" : r.status === "approved" ? "Approved" : r.status === "pending" ? "Pending" : (r.status || "");
           var cls = (r.status === "paid" || r.status === "approved") ? "paid" : "pending";
-          return "<tr><td class='cust'>" + esc(mask(r.customerEmail)) + "<div class='date'>" + esc(day(r.createdAt)) + "</div></td><td><span class='badge " + cls + "'>" + esc(badge) + "</span></td><td class='amt'>+" + esc(usd(r.amount)) + "</td></tr>";
+          return "<tr><td class='cust'>" + esc(mask(r.customer_email)) + "<div class='date'>" + esc(day(r.created_at)) + "</div></td><td><span class='badge " + cls + "'>" + esc(badge) + "</span></td><td class='amt'>+" + esc(usd(r.amount)) + "</td></tr>";
         }).join("");
       }
       var np = document.getElementById("nextpayoutwrap"); if (np) np.style.display = "none";
       var earned = Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid);
-      var recent = d.recentCommissions && d.recentCommissions.length;
+      var recent = d.recent_commissions && d.recent_commissions.length;
       if (!recent && earned === 0 && d.stats && Number(d.stats.clicks) === 0) {
         document.getElementById("card").classList.add("is-empty");
       }
@@ -415,12 +415,20 @@
       parent.postMessage({ type: "tolt-embed:error", message: "Failed to load the dashboard" }, "*");
     }
 
+    function dataOrigin() {
+      var platform = /^https:\/\/platform\.tolt\.(com|dev)$/;
+      var local = /^http:\/\/(localhost|127\.0\.0\.1)(:[0-9]+)?$/;
+      if (platform.test(location.origin)) return location.origin;
+      var requested = "";
+      try { requested = new URL(params.get("api") || "").origin; } catch (e) {}
+      return platform.test(requested) || local.test(requested) ? requested : "https://platform.tolt.com";
+    }
+
     var token = params.get("token");
-    var api = params.get("api") || "https://platform.tolt.com";
     if (token) {
       document.getElementById("card").classList.add("is-loading");
       skeletonRows();
-      fetch(api.replace(/\/$/, "") + "/embed/referrals", { headers: { Authorization: "Bearer " + token } })
+      fetch(dataOrigin() + "/embed/referrals", { headers: { Authorization: "Bearer " + token } })
         .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
         .then(function (res) {
           if (!res || !res.data) { showError(); return; }
