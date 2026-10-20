@@ -337,16 +337,22 @@
       return 0.2126 * ch(px[0]) + 0.7152 * ch(px[1]) + 0.0722 * ch(px[2]);
     }
 
-    if (applied.brandColor && !applied.brandTextColor) {
+    function pickBrandInk() {
       var lum = luminance(
         getComputedStyle(document.getElementById("copy")).backgroundColor,
         getComputedStyle(document.getElementById("card")).backgroundColor
       );
-      if (lum != null) {
-        var onWhite = 1.05 / (lum + 0.05);
-        var onDark = (lum + 0.05) / (luminance("#0d0f12") + 0.05);
-        document.documentElement.style.setProperty("--brand-ink", onWhite >= onDark ? "#ffffff" : "#0d0f12");
-      }
+      if (lum == null) return;
+      var onWhite = 1.05 / (lum + 0.05);
+      var onDark = (lum + 0.05) / (luminance("#0d0f12") + 0.05);
+      document.documentElement.style.setProperty("--brand-ink", onWhite >= onDark ? "#ffffff" : "#0d0f12");
+    }
+
+    if (applied.brandColor && !applied.brandTextColor) {
+      pickBrandInk();
+      var scheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+      if (scheme && scheme.addEventListener) scheme.addEventListener("change", pickBrandInk);
+      else if (scheme && scheme.addListener) scheme.addListener(pickBrandInk);
     }
 
     var label = document.getElementById("copytext");
