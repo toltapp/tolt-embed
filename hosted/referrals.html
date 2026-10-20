@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Referral dashboard</title>
+<script>if (new URLSearchParams(location.search).get("token")) document.documentElement.classList.add("has-token");</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -175,6 +176,8 @@
   .card.is-loading .earn .total .value * { color: transparent !important; }
   .card.is-loading #ratechip,
   .card.is-loading #spark { visibility: hidden; }
+  .card.is-loading #nextpayoutwrap { display: none; }
+  .has-token .card:not(.is-loading):not(.is-ready):not(.is-error) { visibility: hidden; }
   .sk-bar { display: block; height: 11px; border-radius: 6px; background: linear-gradient(90deg, var(--card) 8%, var(--line) 22%, var(--card) 36%); background-size: 900px 100%; animation: tolt-shimmer 1.3s linear infinite; }
   .sk-pill { display: inline-block; width: 60px; height: 20px; border-radius: 999px; background: linear-gradient(90deg, var(--card) 8%, var(--line) 22%, var(--card) 36%); background-size: 900px 100%; animation: tolt-shimmer 1.3s linear infinite; }
 
@@ -468,7 +471,7 @@
         .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
         .then(function (res) {
           if (!res || !res.data) { showError(); return; }
-          document.getElementById("card").classList.remove("is-loading");
+          document.getElementById("card").classList.replace("is-loading", "is-ready");
           hydrate(res.data);
           postHeight();
           parent.postMessage({ type: "tolt-embed:ready" }, "*");
