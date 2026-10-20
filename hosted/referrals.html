@@ -321,11 +321,15 @@
       }
     });
 
-    function luminance(color) {
+    function luminance(color, base) {
       var ctx = document.createElement("canvas").getContext("2d");
       if (!ctx) return null;
-      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#ffffff";
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, 1, 1);
+      if (base) {
+        ctx.fillStyle = base;
+        ctx.fillRect(0, 0, 1, 1);
+      }
       ctx.fillStyle = color;
       ctx.fillRect(0, 0, 1, 1);
       var px = ctx.getImageData(0, 0, 1, 1).data;
@@ -334,7 +338,10 @@
     }
 
     if (applied.brandColor && !applied.brandTextColor) {
-      var lum = luminance(applied.brandColor);
+      var lum = luminance(
+        getComputedStyle(document.getElementById("copy")).backgroundColor,
+        getComputedStyle(document.getElementById("card")).backgroundColor
+      );
       if (lum != null) {
         var onWhite = 1.05 / (lum + 0.05);
         var onDark = (lum + 0.05) / (luminance("#0d0f12") + 0.05);
