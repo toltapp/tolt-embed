@@ -10,7 +10,7 @@ export type ToltEmbedTheme = "light" | "dark" | "system";
 export type ToltEmbedThemeOptions = {
   /** Accent: the copy button, links, and the earnings sparkline. */
   brandColor?: string;
-  /** Text and icons that sit on top of `brandColor`. */
+  /** Text and icons that sit on top of `brandColor`. Defaults to white or near-black, whichever contrasts better with `brandColor`. */
   brandTextColor?: string;
   /** The dashboard card surface. */
   backgroundColor?: string;
