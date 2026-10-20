@@ -302,6 +302,7 @@
       headingFontFamily: { name: "--display", prop: "font-family" }
     };
     var canValidate = typeof CSS !== "undefined" && CSS.supports;
+    var applied = {};
     Object.keys(themeVars).forEach(function (key) {
       var value = params.get(key);
       if (!value) return;
@@ -309,6 +310,7 @@
       if (key === "radius" && /^[0-9]+(\.[0-9]+)?$/.test(value)) value = value + "px";
       if (canValidate && !CSS.supports(spec.prop, value)) return;
       document.documentElement.style.setProperty(spec.name, value);
+      applied[key] = value;
       if (key === "radius") {
         var single = /^([0-9]+(?:\.[0-9]+)?)px$/.exec(value);
         if (single) {
@@ -318,6 +320,40 @@
         }
       }
     });
+
+    function luminance(color, base) {
+      var ctx = document.createElement("canvas").getContext("2d");
+      if (!ctx) return null;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 1, 1);
+      if (base) {
+        ctx.fillStyle = base;
+        ctx.fillRect(0, 0, 1, 1);
+      }
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, 1, 1);
+      var px = ctx.getImageData(0, 0, 1, 1).data;
+      var ch = function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+      return 0.2126 * ch(px[0]) + 0.7152 * ch(px[1]) + 0.0722 * ch(px[2]);
+    }
+
+    function pickBrandInk() {
+      var lum = luminance(
+        getComputedStyle(document.getElementById("copy")).backgroundColor,
+        getComputedStyle(document.getElementById("card")).backgroundColor
+      );
+      if (lum == null) return;
+      var onWhite = 1.05 / (lum + 0.05);
+      var onDark = (lum + 0.05) / (luminance("#0d0f12") + 0.05);
+      document.documentElement.style.setProperty("--brand-ink", onWhite >= onDark ? "#ffffff" : "#0d0f12");
+    }
+
+    if (applied.brandColor && !applied.brandTextColor) {
+      pickBrandInk();
+      var scheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+      if (scheme && scheme.addEventListener) scheme.addEventListener("change", pickBrandInk);
+      else if (scheme && scheme.addListener) scheme.addListener(pickBrandInk);
+    }
 
     var label = document.getElementById("copytext");
     document.getElementById("copy").addEventListener("click", function () {

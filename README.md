@@ -67,7 +67,7 @@ The token is public and short-lived, so it's safe to send to the browser. The co
 | Field | Applies to |
 | --- | --- |
 | `brandColor` | Accent: the copy button, links, and the earnings sparkline. |
-| `brandTextColor` | Text and icons on top of `brandColor`. |
+| `brandTextColor` | Text and icons on top of `brandColor`. Defaults to white or near-black, whichever contrasts better with `brandColor`. |
 | `backgroundColor` | The dashboard card surface. |
 | `surfaceColor` | Raised tiles inside the card (stats, the referral-link field). |
 | `textColor` | Primary text. |
