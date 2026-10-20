@@ -1,6 +1,6 @@
 {
   "name": "@tolt/embed",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Drop a partner's referral dashboard into your app with one React component.",
   "license": "Apache-2.0",
   "type": "module",

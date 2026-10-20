@@ -1,3 +1,10 @@
+## [0.2.0](https://github.com/toltapp/tolt-embed/compare/v0.1.4...v0.2.0) (2026-10-20)
+
+### Features
+
+* render recent referrals as a coss card table ([dc8a8c5](https://github.com/toltapp/tolt-embed/commit/dc8a8c5338c6a3d52913be98ac8c2e0be29eac29))
+* restyle the referral dashboard with coss ui neutrals ([8553d77](https://github.com/toltapp/tolt-embed/commit/8553d779936e50c33923799e191350f331467ed5))
+
 ## [0.1.4](https://github.com/toltapp/tolt-embed/compare/v0.1.3...v0.1.4) (2026-10-20)
 
 ### Bug Fixes
