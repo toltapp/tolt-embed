@@ -1,3 +1,12 @@
+## [0.1.3](https://github.com/toltapp/tolt-embed/compare/v0.1.2...v0.1.3) (2026-10-20)
+
+### Bug Fixes
+
+* composite translucent brand colors over the card before picking ink ([7b31a27](https://github.com/toltapp/tolt-embed/commit/7b31a278c94c6e4ec4794ded3d3eb534efdf969d))
+* measure the rendered brand color so var() references resolve ([008b082](https://github.com/toltapp/tolt-embed/commit/008b082211f79f63b2c78e87333c8d9dcaa4973c))
+* pick a readable brand text color when only brandColor is set ([0594d61](https://github.com/toltapp/tolt-embed/commit/0594d610450add606602143fedba120bd4dd69ab))
+* recompute brand ink when the system color scheme changes ([70323a2](https://github.com/toltapp/tolt-embed/commit/70323a25155dfb60eb076db83c7eaaeeba78e52c))
+
 ## [0.1.2](https://github.com/toltapp/tolt-embed/compare/v0.1.1...v0.1.2) (2026-10-19)
 
 ### Bug Fixes
