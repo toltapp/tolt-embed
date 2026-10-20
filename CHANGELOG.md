@@ -1,3 +1,9 @@
+## [0.1.4](https://github.com/toltapp/tolt-embed/compare/v0.1.3...v0.1.4) (2026-10-20)
+
+### Bug Fixes
+
+* don't flash the sample dashboard while a token is loading ([8f4b486](https://github.com/toltapp/tolt-embed/commit/8f4b48634e32635d60308afb4ac1b63507ad4e41))
+
 ## [0.1.3](https://github.com/toltapp/tolt-embed/compare/v0.1.2...v0.1.3) (2026-10-20)
 
 ### Bug Fixes
