@@ -37,7 +37,7 @@ export function ReferralsPage({ token }: { token: string }) {
       token={token}
       theme="dark"
       themeOptions={{
-        brandColor: "#B1FD7A",
+        brandColor: "#4F46E5",
         backgroundColor: "#191919",
         radius: 10,
       }}
@@ -82,7 +82,7 @@ The token is public and short-lived, so it's safe to send to the browser. The co
   token={token}
   theme="dark"
   themeOptions={{
-    brandColor: "#B1FD7A",
+    brandColor: "#4F46E5",
     brandTextColor: "#0D0F12",
     backgroundColor: "#191919",
     surfaceColor: "#111214",
@@ -102,7 +102,7 @@ Drop the iframe in directly. The same theme options are query parameters:
 
 ```html
 <iframe
-  src="https://embed.tolt.com/referrals?token=PUBLIC_TOKEN&theme=dark&brandColor=%23B1FD7A&backgroundColor=%23191919&radius=10"
+  src="https://embed.tolt.com/referrals?token=PUBLIC_TOKEN&theme=dark&brandColor=%234F46E5&backgroundColor=%23191919&radius=10"
   style="width: 100%; border: none"
   allow="clipboard-write"
 ></iframe>

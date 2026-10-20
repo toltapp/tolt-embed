@@ -7,52 +7,76 @@
 <script>if (new URLSearchParams(location.search).get("token")) document.documentElement.classList.add("has-token");</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
     color-scheme: light;
-    --brand: #b1fd7a;
-    --brand-ink: #1b3a0e;
+    --brand: #262626;
+    --brand-ink: #fafafa;
     --r: 16px;
+    --r-sm: 12px;
+    --r-xs: 9px;
     --bg: #ffffff;
-    --card: #f7f8f9;
-    --text: #0d0f12;
-    --muted: #646b74;
-    --line: #e9ebee;
-    --pos: #17994f;
-    --pos-bg: #e7f6ec;
-    --warn: #9a6413;
-    --warn-bg: #fbf1de;
-    --shadow: 0 1px 2px rgba(16,18,22,.04), 0 8px 28px -12px rgba(16,18,22,.14);
+    --card: #ffffff;
+    --text: #262626;
+    --muted: #686868;
+    --line: rgba(0,0,0,.08);
+    --input: rgba(0,0,0,.1);
+    --soft: rgba(0,0,0,.04);
+    --frame: rgba(0,0,0,.029);
+    --pos: #047857;
+    --pos-bg: rgba(16,185,129,.08);
+    --warn: #b45309;
+    --warn-bg: rgba(245,158,11,.08);
+    --hl: 0 1px rgba(0,0,0,.04);
+    --skel-hl: rgba(255,255,255,.64);
+    --hover: #000000;
+    --shadow: 0 1px 2px rgba(0,0,0,.05);
     --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --display: "Plus Jakarta Sans", var(--sans);
+    --display: var(--sans);
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #0f1114;
-    --card: #16181c;
-    --text: #f2f4f6;
-    --muted: #9aa1ab;
-    --line: #24272d;
-    --pos: #45c97a;
-    --pos-bg: #12301f;
-    --warn: #e5b567;
-    --warn-bg: #33260f;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
+    --brand: #f5f5f5;
+    --brand-ink: #262626;
+    --bg: #181818;
+    --card: #141414;
+    --text: #f5f5f5;
+    --muted: #818181;
+    --line: rgba(255,255,255,.06);
+    --input: rgba(255,255,255,.08);
+    --soft: rgba(255,255,255,.04);
+    --frame: rgba(255,255,255,.029);
+    --pos: #34d399;
+    --pos-bg: rgba(16,185,129,.16);
+    --warn: #fbbf24;
+    --warn-bg: rgba(245,158,11,.16);
+    --hl: 0 -1px rgba(255,255,255,.06);
+    --skel-hl: rgba(255,255,255,.04);
+    --hover: #ffffff;
+    --shadow: 0 1px 2px rgba(0,0,0,.05);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --bg: #0f1114;
-      --card: #16181c;
-      --text: #f2f4f6;
-      --muted: #9aa1ab;
-      --line: #24272d;
-      --pos: #45c97a;
-      --pos-bg: #12301f;
-      --warn: #e5b567;
-      --warn-bg: #33260f;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
+      --brand: #f5f5f5;
+      --brand-ink: #262626;
+      --bg: #181818;
+      --card: #141414;
+      --text: #f5f5f5;
+      --muted: #818181;
+      --line: rgba(255,255,255,.06);
+      --input: rgba(255,255,255,.08);
+      --soft: rgba(255,255,255,.04);
+      --frame: rgba(255,255,255,.029);
+      --pos: #34d399;
+      --pos-bg: rgba(16,185,129,.16);
+      --warn: #fbbf24;
+      --warn-bg: rgba(245,158,11,.16);
+      --hl: 0 -1px rgba(255,255,255,.06);
+      --skel-hl: rgba(255,255,255,.04);
+    --hover: #ffffff;
+      --shadow: 0 1px 2px rgba(0,0,0,.05);
     }
   }
   * { box-sizing: border-box; }
@@ -64,12 +88,17 @@
     -webkit-font-smoothing: antialiased;
     line-height: 1.45;
   }
+  .card, .stat, .linkbar .field { position: relative; }
+  .card::before, .stat::before, .linkbar .field::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    border-radius: inherit; box-shadow: var(--hl);
+  }
   .card {
     background: var(--bg);
     border: 1px solid var(--line);
     border-radius: var(--r);
     box-shadow: var(--shadow);
-    padding: 22px;
+    padding: 20px;
     max-width: 680px;
     margin: 0 auto;
   }
@@ -77,100 +106,117 @@
   .between { justify-content: space-between; }
   .head { margin-bottom: 20px; }
   .avatar {
-    width: 44px; height: 44px; border-radius: 50%;
+    width: 40px; height: 40px; border-radius: 50%;
     display: grid; place-items: center;
-    font-family: var(--display); font-weight: 700; font-size: 15px;
+    font-weight: 500; font-size: 13px;
     color: var(--brand-ink);
     background: var(--brand);
     flex: none;
   }
   .who { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-  .who .name { font-family: var(--display); font-weight: 700; font-size: 15px; }
+  .who .name { font-weight: 600; font-size: 14px; }
   .who .email { color: var(--muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .chip {
-    font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px;
-    background: var(--card); border: 1px solid var(--line); color: var(--muted);
+    font-size: 12px; font-weight: 500; height: 22px; padding: 0 7px; border-radius: 6px;
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--card); border: 1px solid var(--input); color: var(--muted);
     white-space: nowrap;
   }
-  .chip b { color: var(--text); font-weight: 700; }
+  .chip b { color: var(--text); font-weight: 600; }
 
   .earn { display: grid; grid-template-columns: 1.25fr 1fr; gap: 18px; align-items: end; margin-bottom: 18px; }
-  .earn .total .label, .stat .label { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .earn .total .label, .stat .label { font-size: 12.5px; color: var(--muted); }
   .earn .total .value {
-    font-family: var(--display); font-weight: 800; letter-spacing: -0.02em;
-    font-size: 38px; line-height: 1.05; margin-top: 4px;
+    font-weight: 600; letter-spacing: -0.025em;
+    font-size: 32px; line-height: 1.1; margin-top: 4px;
     font-variant-numeric: tabular-nums;
   }
-  .subearn { display: flex; gap: 18px; margin-top: 10px; }
+  .subearn { display: flex; gap: 20px; margin-top: 10px; }
   .subearn div { font-size: 12.5px; color: var(--muted); }
-  .subearn b { display: block; font-family: var(--display); font-weight: 700; font-size: 15px; color: var(--text); font-variant-numeric: tabular-nums; }
+  .subearn b { display: block; font-weight: 600; font-size: 14px; color: var(--text); font-variant-numeric: tabular-nums; }
   .spark { width: 100%; height: 76px; display: block; }
 
-  .linkbar { display: flex; gap: 8px; margin-bottom: 20px; }
+  .linkbar { display: flex; gap: 8px; margin-bottom: 16px; }
   .linkbar .field {
     flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--r-xs, 10px);
-    padding: 0 12px; height: 40px; font-size: 13.5px; color: var(--text);
+    background: var(--card); border: 1px solid var(--input); border-radius: var(--r-xs);
+    box-shadow: var(--shadow);
+    padding: 0 11px; height: 36px; font-size: 13.5px; color: var(--text);
     font-variant-numeric: tabular-nums;
   }
   .linkbar .field span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .linkbar .field .globe { color: var(--muted); flex: none; }
   .copy {
-    height: 40px; padding: 0 16px; border-radius: var(--r-xs, 10px); border: 1px solid transparent;
+    height: 36px; padding: 0 13px; border-radius: var(--r-xs); border: 1px solid var(--brand);
     background: var(--brand); color: var(--brand-ink);
-    font-family: var(--sans); font-weight: 600; font-size: 13.5px; cursor: pointer;
+    box-shadow: inset 0 1px rgba(255,255,255,.16), 0 1px 2px rgba(0,0,0,.08);
+    font-family: var(--sans); font-weight: 500; font-size: 13.5px; cursor: pointer;
     display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
-    transition: filter .12s ease, transform .06s ease;
+    transition: opacity .15s ease, transform .15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
-  .copy:hover { filter: brightness(.96); }
-  .copy:active { transform: translateY(1px); }
+  .copy svg { opacity: .8; }
+  .copy:hover { opacity: .9; }
+  .copy:active { transform: scale(.97); box-shadow: inset 0 1px rgba(0,0,0,.08); }
 
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
-  .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm, 12px); padding: 12px 13px; }
-  .stat .value { font-family: var(--display); font-weight: 700; font-size: 19px; margin-top: 5px; font-variant-numeric: tabular-nums; }
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px;
+    background: var(--frame); border-radius: var(--r); margin-bottom: 20px;
+  }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm); box-shadow: var(--shadow); padding: 12px 14px; }
+  .stat .value { font-weight: 600; font-size: 18px; margin-top: 4px; font-variant-numeric: tabular-nums; }
 
-  .sec { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 0 0 10px; }
-  table { width: 100%; border-collapse: collapse; }
-  td { padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px; vertical-align: middle; }
-  tr:first-child td { border-top: none; }
+  .sec { font-size: 13.5px; font-weight: 600; color: var(--text); margin: 0 0 8px; }
+  .tframe { background: var(--frame); border-radius: var(--r); padding: 4px; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  th { height: 34px; padding: 0 10px; text-align: left; font-size: 12.5px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+  td { padding: 10px; background: var(--card); border-bottom: 1px solid var(--line); font-size: 13px; vertical-align: middle; }
+  td:first-child { border-left: 1px solid var(--line); }
+  td:last-child { border-right: 1px solid var(--line); }
+  tbody tr:first-child td { border-top: 1px solid var(--line); }
+  tbody tr:first-child td:first-child { border-top-left-radius: var(--r-sm); }
+  tbody tr:first-child td:last-child { border-top-right-radius: var(--r-sm); }
+  tbody tr:last-child td:first-child { border-bottom-left-radius: var(--r-sm); }
+  tbody tr:last-child td:last-child { border-bottom-right-radius: var(--r-sm); }
+  tbody tr:hover td { background: color-mix(in srgb, var(--card), var(--hover) 2%); }
   .cust { font-weight: 500; }
-  .date { color: var(--muted); font-size: 12px; }
-  .amt { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .badge { font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; display: inline-block; }
+  .date { color: var(--muted); font-size: 12px; font-weight: 400; }
+  .amt { text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .badge { font-size: 12px; font-weight: 500; line-height: 18px; padding: 0 6px; border-radius: 5px; display: inline-block; }
   .badge.paid { color: var(--pos); background: var(--pos-bg); }
   .badge.pending { color: var(--warn); background: var(--warn-bg); }
 
   .empty {
-    display: none; text-align: center; padding: 26px 16px 10px;
+    display: none; text-align: center; padding: 24px 16px 8px;
   }
   .empty .ring {
     width: 40px; height: 40px; border-radius: 50%; margin: 0 auto 12px;
     display: grid; place-items: center; color: var(--brand-ink); background: var(--brand);
   }
-  .empty .title { font-family: var(--display); font-weight: 700; font-size: 15px; }
+  .empty .title { font-weight: 600; font-size: 14px; }
   .empty .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
-  .card.is-empty .spark, .card.is-empty #refsHead, .card.is-empty #refs { display: none; }
+  .card.is-empty .spark, .card.is-empty #refsHead, .card.is-empty .tframe { display: none; }
   .card.is-empty .empty { display: block; }
 
   .error-msg { display: none; text-align: center; padding: 30px 16px 14px; }
-  .error-msg .title { font-family: var(--display); font-weight: 700; font-size: 15px; }
+  .error-msg .title { font-weight: 600; font-size: 14px; }
   .error-msg .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
   .card.is-error > :not(.error-msg) { display: none; }
   .card.is-error .error-msg { display: block; }
 
-  @keyframes tolt-shimmer { 0% { background-position: -450px 0; } 100% { background-position: 450px 0; } }
+  @keyframes tolt-skeleton { to { background-position: -200% 0; } }
   .card.is-loading #pname,
   .card.is-loading #pemail,
   .card.is-loading .earn .total .value,
   .card.is-loading .subearn b,
   .card.is-loading .field span,
   .card.is-loading .stat .value,
-  .card.is-loading #avatar {
+  .card.is-loading #avatar,
+  .sk-bar,
+  .sk-pill {
     color: transparent !important;
-    background: linear-gradient(90deg, var(--card) 8%, var(--line) 22%, var(--card) 36%);
-    background-size: 900px 100%;
-    animation: tolt-shimmer 1.3s linear infinite;
-    border-radius: 6px;
+    background: linear-gradient(120deg, transparent 40%, var(--skel-hl), transparent 60%) var(--soft) 0 0 / 200% 100% fixed;
+    animation: tolt-skeleton 2s -1s infinite linear;
+    border-radius: 5px;
   }
   .card.is-loading #avatar { border-radius: 50%; }
   .card.is-loading .earn .total .value * { color: transparent !important; }
@@ -178,11 +224,11 @@
   .card.is-loading #spark { visibility: hidden; }
   .card.is-loading #nextpayoutwrap { display: none; }
   .has-token .card:not(.is-loading):not(.is-ready):not(.is-error) { visibility: hidden; }
-  .sk-bar { display: block; height: 11px; border-radius: 6px; background: linear-gradient(90deg, var(--card) 8%, var(--line) 22%, var(--card) 36%); background-size: 900px 100%; animation: tolt-shimmer 1.3s linear infinite; }
-  .sk-pill { display: inline-block; width: 60px; height: 20px; border-radius: 999px; background: linear-gradient(90deg, var(--card) 8%, var(--line) 22%, var(--card) 36%); background-size: 900px 100%; animation: tolt-shimmer 1.3s linear infinite; }
+  .sk-bar { display: block; height: 11px; }
+  .sk-pill { display: inline-block; width: 60px; height: 18px; }
 
-  .foot { display: block; text-align: center; margin-top: 20px; color: var(--muted); font-size: 12px; text-decoration: none; }
-  .foot b { color: var(--text); font-weight: 700; }
+  .foot { display: block; text-align: center; margin-top: 18px; color: var(--muted); font-size: 12px; text-decoration: none; }
+  .foot b { color: var(--text); font-weight: 600; }
   .foot:hover b { text-decoration: underline; }
   @media (max-width: 560px) {
     .earn { grid-template-columns: 1fr; }
@@ -217,12 +263,12 @@
       <svg id="spark" class="spark" viewBox="0 0 260 76" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="var(--brand)" stop-opacity="0.45" />
+            <stop offset="0" stop-color="var(--brand)" stop-opacity="0.14" />
             <stop offset="1" stop-color="var(--brand)" stop-opacity="0" />
           </linearGradient>
         </defs>
         <path d="M0,60 L26,58 L52,50 L78,52 L104,40 L130,42 L156,30 L182,26 L208,20 L234,14 L260,8 L260,76 L0,76 Z" fill="url(#g)" />
-        <path d="M0,60 L26,58 L52,50 L78,52 L104,40 L130,42 L156,30 L182,26 L208,20 L234,14 L260,8" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M0,60 L26,58 L52,50 L78,52 L104,40 L130,42 L156,30 L182,26 L208,20 L234,14 L260,8" fill="none" stroke="var(--brand)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </div>
 
@@ -245,7 +291,10 @@
     </div>
 
     <p class="sec" id="refsHead">Recent referrals</p>
-    <table id="refs">
+    <div class="tframe">
+    <table>
+      <thead><tr><th>Customer</th><th>Status</th><th class="amt">Commission</th></tr></thead>
+      <tbody id="refs">
       <tr>
         <td class="cust">m•••@northwind.io<div class="date">Aug 22, 2026</div></td>
         <td><span class="badge pending">Pending</span></td>
@@ -266,7 +315,9 @@
         <td><span class="badge paid">Paid</span></td>
         <td class="amt">+$40.00</td>
       </tr>
+      </tbody>
     </table>
+    </div>
 
     <div class="empty">
       <div class="ring">
