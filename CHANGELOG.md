@@ -1,3 +1,10 @@
+## [0.3.0](https://github.com/toltapp/tolt-embed/compare/v0.2.0...v0.3.0) (2026-10-21)
+
+### Features
+
+* **hosted:** add a portal link, in-place refresh and clearer earnings rows ([86f0abe](https://github.com/toltapp/tolt-embed/commit/86f0abe25a5da9a083a5329a3f539212c577e1e9))
+* **hosted:** say Powered by Tolt in the footer ([c66207d](https://github.com/toltapp/tolt-embed/commit/c66207d1c9973f115afa1ced276c794c36cf44f4))
+
 ## [0.2.0](https://github.com/toltapp/tolt-embed/compare/v0.1.4...v0.2.0) (2026-10-20)
 
 ### Features
