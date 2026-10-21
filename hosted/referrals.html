@@ -138,8 +138,22 @@
   .icon-btn:active, .link-btn:active { transform: scale(.96); }
   .icon-btn:focus-visible, .link-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
   .icon-btn:disabled { cursor: default; }
+  [data-tip] { position: relative; }
+  [data-tip]::after {
+    content: attr(data-tip); position: absolute; top: calc(100% + 6px); left: 50%; z-index: 2;
+    transform: translate(-50%, -2px); opacity: 0; pointer-events: none; white-space: nowrap;
+    padding: 4px 8px; border-radius: 6px; background: var(--text); color: var(--bg);
+    font-family: var(--sans); font-size: 12px; font-weight: 500; line-height: 16px;
+    transition: opacity .12s ease, transform .12s ease;
+  }
+  .tip-end::after { left: auto; right: 0; transform: translate(0, -2px); }
+  [data-tip]:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+  .tip-end:focus-visible::after { transform: translate(0, 0); }
   @media (hover: hover) and (pointer: fine) {
     .icon-btn:hover, .link-btn:hover { background: color-mix(in srgb, var(--card), var(--hover) 3%); }
+    [data-tip]:hover::after { opacity: 1; transform: translate(-50%, 0); transition-delay: .35s; }
+    .tip-end:hover::after { transform: translate(0, 0); }
+    .card.is-refreshing #refresh::after { opacity: 0; }
   }
   @keyframes tolt-spin { to { transform: rotate(360deg); } }
   .card.is-refreshing #refresh svg { animation: tolt-spin .8s linear infinite; }
@@ -161,6 +175,7 @@
   .spark { width: 100%; height: 76px; display: block; }
 
   .linkbar { display: flex; gap: 8px; margin-bottom: 16px; }
+  .linkbar[hidden] { display: none; }
   .linkbar .field {
     flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
     background: var(--card); border: 1px solid var(--input); border-radius: var(--r-xs);
@@ -274,10 +289,10 @@
       </div>
       <div class="head-end">
         <div class="chip" id="ratechip"><b>20%</b> recurring</div>
-        <button class="icon-btn" id="refresh" type="button" aria-label="Refresh" title="Refresh" hidden>
+        <button class="icon-btn" id="refresh" type="button" aria-label="Refresh" data-tip="Refresh" hidden>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
         </button>
-        <a class="link-btn" id="portal" target="_blank" rel="noopener noreferrer" title="Open the partner portal in a new tab" hidden>
+        <a class="link-btn tip-end" id="portal" target="_blank" rel="noopener noreferrer" aria-label="Open the partner portal in a new tab" data-tip="Open partner portal" hidden>
           Portal
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
         </a>
@@ -306,7 +321,7 @@
       </svg>
     </div>
 
-    <div class="linkbar">
+    <div class="linkbar" id="linkbar">
       <div class="field">
         <svg class="globe" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
         <span id="link">acme.com/?ref=jane</span>
@@ -496,19 +511,20 @@
       var portal = document.getElementById("portal");
       if (d.portal_url) { portal.href = d.portal_url; portal.hidden = false; } else { portal.hidden = true; }
       document.getElementById("refresh").hidden = false;
-      if (d.link && d.link.url) set("link", d.link.url.replace(/^https?:\/\//, ""));
+      var hasLink = Boolean(d.link && d.link.url);
+      if (hasLink) set("link", d.link.url.replace(/^https?:\/\//, ""));
+      document.getElementById("linkbar").hidden = !hasLink;
       var tot = money(Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid));
       set("total", tot[0]); set("totalCents", tot[1]);
       set("pending", usd(d.earnings.pending));
       set("paid", usd(d.earnings.paid));
+      var sg = document.getElementById("statsgrid");
+      if (sg) sg.style.display = d.stats ? "" : "none";
       if (d.stats) {
         set("clicks", Number(d.stats.clicks).toLocaleString("en-US"));
         set("signups", Number(d.stats.leads).toLocaleString("en-US"));
         set("customers", Number(d.stats.customers).toLocaleString("en-US"));
         set("conv", Number(d.stats.conversion_rate).toFixed(1) + "%");
-      } else {
-        var sg = document.getElementById("statsgrid");
-        if (sg) sg.style.display = "none";
       }
       drawSpark(d.series);
       var refs = document.getElementById("refs");
