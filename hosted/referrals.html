@@ -161,6 +161,7 @@
   .spark { width: 100%; height: 76px; display: block; }
 
   .linkbar { display: flex; gap: 8px; margin-bottom: 16px; }
+  .linkbar[hidden] { display: none; }
   .linkbar .field {
     flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
     background: var(--card); border: 1px solid var(--input); border-radius: var(--r-xs);
@@ -306,7 +307,7 @@
       </svg>
     </div>
 
-    <div class="linkbar">
+    <div class="linkbar" id="linkbar">
       <div class="field">
         <svg class="globe" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
         <span id="link">acme.com/?ref=jane</span>
@@ -496,19 +497,20 @@
       var portal = document.getElementById("portal");
       if (d.portal_url) { portal.href = d.portal_url; portal.hidden = false; } else { portal.hidden = true; }
       document.getElementById("refresh").hidden = false;
-      if (d.link && d.link.url) set("link", d.link.url.replace(/^https?:\/\//, ""));
+      var hasLink = Boolean(d.link && d.link.url);
+      if (hasLink) set("link", d.link.url.replace(/^https?:\/\//, ""));
+      document.getElementById("linkbar").hidden = !hasLink;
       var tot = money(Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid));
       set("total", tot[0]); set("totalCents", tot[1]);
       set("pending", usd(d.earnings.pending));
       set("paid", usd(d.earnings.paid));
+      var sg = document.getElementById("statsgrid");
+      if (sg) sg.style.display = d.stats ? "" : "none";
       if (d.stats) {
         set("clicks", Number(d.stats.clicks).toLocaleString("en-US"));
         set("signups", Number(d.stats.leads).toLocaleString("en-US"));
         set("customers", Number(d.stats.customers).toLocaleString("en-US"));
         set("conv", Number(d.stats.conversion_rate).toFixed(1) + "%");
-      } else {
-        var sg = document.getElementById("statsgrid");
-        if (sg) sg.style.display = "none";
       }
       drawSpark(d.series);
       var refs = document.getElementById("refs");
