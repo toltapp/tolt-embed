@@ -104,7 +104,7 @@ export function ToltEmbed({
       title="Tolt referral dashboard"
       className={className}
       allow="clipboard-write"
-      style={{ width: "100%", border: "none", colorScheme: "auto", height: height || 520, ...style }}
+      style={{ width: "100%", border: "none", colorScheme: theme === "system" ? "light dark" : theme, height: height || 520, ...style }}
     />
   );
 }
