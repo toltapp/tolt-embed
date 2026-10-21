@@ -15,15 +15,15 @@ Mint a scoped token on your server, then render the component on the client.
 On your server (the API key stays here, never in the browser):
 
 ```ts
-const res = await fetch("https://api.tolt.com/v2/embed-tokens", {
+const res = await fetch("https://platform.tolt.com/v2/embed-tokens", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.TOLT_API_KEY}`,
     "Content-Type": "application/json",
   },
-  body: JSON.stringify({ partnerId: "part_9fQ2xLL" }),
+  body: JSON.stringify({ partner_id: "part_9fQ2xLL" }),
 });
-const { token } = await res.json();
+const { token } = (await res.json()).data;
 ```
 
 On the client:
@@ -56,7 +56,7 @@ The token is public and short-lived, so it's safe to send to the browser. The co
 | `data` | `"referrals"` | `"referrals"` | Which embed to render. |
 | `theme` | `"light" \| "dark" \| "system"` | `"system"` | Follows the partner's OS setting by default. |
 | `themeOptions` | `ToltEmbedThemeOptions` | none | Recolor and reshape the widget to match your app. |
-| `baseUrl` | `string` | `https://embed.tolt.com` | Point at a local host, or straight at a hosted `.html` file, during development. |
+| `baseUrl` | `string` | `https://platform.tolt.com` | Point at a local host, or straight at a hosted `.html` file, during development. |
 | `onReady` | `() => void` | none | Fires once the dashboard has loaded. |
 | `onError` | `(message: string) => void` | none | Fires if the token is rejected. |
 
@@ -102,7 +102,7 @@ Drop the iframe in directly. The same theme options are query parameters:
 
 ```html
 <iframe
-  src="https://embed.tolt.com/referrals?token=PUBLIC_TOKEN&theme=dark&brandColor=%234F46E5&backgroundColor=%23191919&radius=10"
+  src="https://platform.tolt.com/referrals?token=PUBLIC_TOKEN&theme=dark&brandColor=%234F46E5&backgroundColor=%23191919&radius=10"
   style="width: 100%; border: none"
   allow="clipboard-write"
 ></iframe>
