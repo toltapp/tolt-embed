@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/toltapp/tolt-embed/compare/v0.3.0...v0.3.1) (2026-10-21)
+
+### Bug Fixes
+
+* **hosted:** hide the link and restore stats when a refresh changes them ([cb82e1e](https://github.com/toltapp/tolt-embed/commit/cb82e1e9b8a833b6a2fe6760455c9c28caa63344))
+* **hosted:** replace native title tooltips with aligned styled ones ([4ec184f](https://github.com/toltapp/tolt-embed/commit/4ec184f7e3b7c8d3956acec9d8f34587be379979))
+
 ## [0.3.0](https://github.com/toltapp/tolt-embed/compare/v0.2.0...v0.3.0) (2026-10-21)
 
 ### Features
