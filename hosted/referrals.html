@@ -123,6 +123,30 @@
     white-space: nowrap;
   }
   .chip b { color: var(--text); font-weight: 600; }
+  .head-end { display: flex; align-items: center; gap: 6px; flex: none; }
+  .icon-btn, .link-btn {
+    height: 32px; border-radius: var(--r-xs); flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--card); border: 1px solid var(--input); color: var(--text);
+    box-shadow: var(--shadow); cursor: pointer;
+    font-family: var(--sans); font-weight: 500; font-size: 13px; text-decoration: none; white-space: nowrap;
+    transition: background-color .15s ease, transform .15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .icon-btn { width: 32px; padding: 0; }
+  .link-btn { gap: 5px; padding: 0 9px 0 11px; }
+  .icon-btn[hidden], .link-btn[hidden] { display: none; }
+  .icon-btn:active, .link-btn:active { transform: scale(.96); }
+  .icon-btn:focus-visible, .link-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+  .icon-btn:disabled { cursor: default; }
+  @media (hover: hover) and (pointer: fine) {
+    .icon-btn:hover, .link-btn:hover { background: color-mix(in srgb, var(--card), var(--hover) 3%); }
+  }
+  @keyframes tolt-spin { to { transform: rotate(360deg); } }
+  .card.is-refreshing #refresh svg { animation: tolt-spin .8s linear infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .card.is-refreshing #refresh svg { animation: none; }
+    .card.is-refreshing #refresh { opacity: .5; }
+  }
 
   .earn { display: grid; grid-template-columns: 1.25fr 1fr; gap: 18px; align-items: end; margin-bottom: 18px; }
   .earn .total .label, .stat .label { font-size: 12.5px; color: var(--muted); }
@@ -142,7 +166,6 @@
     background: var(--card); border: 1px solid var(--input); border-radius: var(--r-xs);
     box-shadow: var(--shadow);
     padding: 0 11px; height: 36px; font-size: 13.5px; color: var(--text);
-    font-variant-numeric: tabular-nums;
   }
   .linkbar .field span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .linkbar .field .globe { color: var(--muted); flex: none; }
@@ -221,6 +244,8 @@
   .card.is-loading #avatar { border-radius: 50%; }
   .card.is-loading .earn .total .value * { color: transparent !important; }
   .card.is-loading #ratechip,
+  .card.is-loading .head-end .icon-btn,
+  .card.is-loading .head-end .link-btn,
   .card.is-loading #spark { visibility: hidden; }
   .card.is-loading #nextpayoutwrap { display: none; }
   .has-token .card:not(.is-loading):not(.is-ready):not(.is-error) { visibility: hidden; }
@@ -247,7 +272,16 @@
           <div class="email" id="pemail">jane@acme.com</div>
         </div>
       </div>
-      <div class="chip" id="ratechip"><b>20%</b> recurring</div>
+      <div class="head-end">
+        <div class="chip" id="ratechip"><b>20%</b> recurring</div>
+        <button class="icon-btn" id="refresh" type="button" aria-label="Refresh" title="Refresh" hidden>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        </button>
+        <a class="link-btn" id="portal" target="_blank" rel="noopener noreferrer" title="Open the partner portal in a new tab" hidden>
+          Portal
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+        </a>
+      </div>
     </div>
 
     <div class="earn">
@@ -290,7 +324,7 @@
       <div class="stat"><div class="label">Conv. rate</div><div class="value" id="conv">3.0%</div></div>
     </div>
 
-    <p class="sec" id="refsHead">Recent referrals</p>
+    <p class="sec" id="refsHead">Recent earnings</p>
     <div class="tframe">
     <table>
       <thead><tr><th>Customer</th><th>Status</th><th class="amt">Commission</th></tr></thead>
@@ -332,7 +366,7 @@
       <div class="sub">Please refresh to try again.</div>
     </div>
 
-    <a class="foot" id="foot" href="https://tolt.com" target="_blank" rel="noopener noreferrer">Referrals by <b>Tolt</b></a>
+    <a class="foot" id="foot" href="https://tolt.com" target="_blank" rel="noopener noreferrer">Powered by <b>Tolt</b></a>
   </div>
 
 <script>
@@ -426,7 +460,8 @@
 
     function usd(c) { return "$" + (Number(c) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
     function money(c) { var s = usd(c); var d = s.lastIndexOf("."); return [s.slice(0, d), s.slice(d)]; }
-    function mask(e) { if (!e || e.indexOf("@") < 0) return "a customer"; var p = e.split("@"); return p[0].slice(0, 1) + "•••@" + p[1]; }
+    function mask(e) { var p = e.split("@"); return p[0].slice(0, 1) + "•••@" + p[1]; }
+    function customerLabel(r) { if (r.customer_email && r.customer_email.indexOf("@") > 0) return mask(r.customer_email); return r.customer_name || "Customer"; }
     function day(d) { return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
     function initials(name, email) { var p = (name || "").trim().split(/\s+/); var a = (p[0] || email || "?")[0] || "?"; var b = p[1] ? p[1][0] : ""; return (a + b).toUpperCase(); }
     function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -450,11 +485,17 @@
     }
 
     function hydrate(d) {
-      var name = [d.partner.first_name, d.partner.last_name].filter(Boolean).join(" ").trim() || d.partner.email;
+      document.getElementById("card").classList.remove("is-empty");
+      var fullName = [d.partner.first_name, d.partner.last_name].filter(Boolean).join(" ").trim();
+      var name = fullName || d.partner.email;
       set("pname", name);
       set("pemail", d.partner.email);
+      document.getElementById("pemail").hidden = !fullName;
       set("avatar", initials(name, d.partner.email));
       var chip = document.getElementById("ratechip"); if (chip) chip.style.display = "none";
+      var portal = document.getElementById("portal");
+      if (d.portal_url) { portal.href = d.portal_url; portal.hidden = false; } else { portal.hidden = true; }
+      document.getElementById("refresh").hidden = false;
       if (d.link && d.link.url) set("link", d.link.url.replace(/^https?:\/\//, ""));
       var tot = money(Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid));
       set("total", tot[0]); set("totalCents", tot[1]);
@@ -475,7 +516,7 @@
         refs.innerHTML = (d.recent_commissions || []).map(function (r) {
           var badge = r.status === "paid" ? "Paid" : r.status === "approved" ? "Approved" : r.status === "pending" ? "Pending" : (r.status || "");
           var cls = (r.status === "paid" || r.status === "approved") ? "paid" : "pending";
-          return "<tr><td class='cust'>" + esc(mask(r.customer_email)) + "<div class='date'>" + esc(day(r.created_at)) + "</div></td><td><span class='badge " + cls + "'>" + esc(badge) + "</span></td><td class='amt'>+" + esc(usd(r.amount)) + "</td></tr>";
+          return "<tr><td class='cust'>" + esc(r.kind === "bonus" ? "Bonus" : customerLabel(r)) + "<div class='date'>" + esc(day(r.created_at)) + "</div></td><td><span class='badge " + cls + "'>" + esc(badge) + "</span></td><td class='amt'>+" + esc(usd(r.amount)) + "</td></tr>";
         }).join("");
       }
       var np = document.getElementById("nextpayoutwrap"); if (np) np.style.display = "none";
@@ -515,15 +556,37 @@
     }
 
     var token = params.get("token");
+
+    function load() {
+      return fetch(dataOrigin() + "/embed/referrals", { headers: { Authorization: "Bearer " + token }, cache: "no-store" })
+        .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+        .then(function (res) { if (!res || !res.data) throw new Error("empty response"); return res.data; });
+    }
+
+    var refreshBtn = document.getElementById("refresh");
+    refreshBtn.addEventListener("click", function () {
+      var card = document.getElementById("card");
+      if (card.classList.contains("is-refreshing")) return;
+      card.classList.add("is-refreshing");
+      refreshBtn.disabled = true;
+      refreshBtn.setAttribute("aria-busy", "true");
+      load()
+        .then(function (d) { hydrate(d); postHeight(); })
+        .catch(function () { parent.postMessage({ type: "tolt-embed:error", message: "Failed to refresh the dashboard" }, "*"); })
+        .then(function () {
+          card.classList.remove("is-refreshing");
+          refreshBtn.disabled = false;
+          refreshBtn.removeAttribute("aria-busy");
+        });
+    });
+
     if (token) {
       document.getElementById("card").classList.add("is-loading");
       skeletonRows();
-      fetch(dataOrigin() + "/embed/referrals", { headers: { Authorization: "Bearer " + token } })
-        .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
-        .then(function (res) {
-          if (!res || !res.data) { showError(); return; }
+      load()
+        .then(function (d) {
           document.getElementById("card").classList.replace("is-loading", "is-ready");
-          hydrate(res.data);
+          hydrate(d);
           postHeight();
           parent.postMessage({ type: "tolt-embed:ready" }, "*");
         })
