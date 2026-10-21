@@ -1,3 +1,9 @@
+## [0.3.2](https://github.com/toltapp/tolt-embed/compare/v0.3.1...v0.3.2) (2026-10-21)
+
+### Bug Fixes
+
+* match the iframe color scheme to the theme so it stays transparent ([b52f3be](https://github.com/toltapp/tolt-embed/commit/b52f3befd3a5ea9fc8c6949913ee6ccb92122d76))
+
 ## [0.3.1](https://github.com/toltapp/tolt-embed/compare/v0.3.0...v0.3.1) (2026-10-21)
 
 ### Bug Fixes
