@@ -1,3 +1,9 @@
+## [0.4.0](https://github.com/toltapp/tolt-embed/compare/v0.3.2...v0.4.0) (2026-11-16)
+
+### Features
+
+* add linkId and hideLink options ([316e846](https://github.com/toltapp/tolt-embed/commit/316e846f75f2160560efcf98494f6131379ca08a))
+
 ## [0.3.2](https://github.com/toltapp/tolt-embed/compare/v0.3.1...v0.3.2) (2026-10-21)
 
 ### Bug Fixes
