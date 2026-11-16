@@ -466,6 +466,10 @@
       setTimeout(function () { label.textContent = "Copy"; }, 1400);
     });
 
+    var hideLink = /^(1|true)$/.test(params.get("hideLink") || "");
+    var linkId = params.get("linkId");
+    if (hideLink) document.getElementById("linkbar").hidden = true;
+
     if (params.get("state") === "empty") {
       document.getElementById("card").classList.add("is-empty");
       set("total", "$0"); set("totalCents", ".00");
@@ -513,7 +517,7 @@
       document.getElementById("refresh").hidden = false;
       var hasLink = Boolean(d.link && d.link.url);
       if (hasLink) set("link", d.link.url.replace(/^https?:\/\//, ""));
-      document.getElementById("linkbar").hidden = !hasLink;
+      document.getElementById("linkbar").hidden = hideLink || !hasLink;
       var tot = money(Number(d.earnings.pending) + Number(d.earnings.approved) + Number(d.earnings.paid));
       set("total", tot[0]); set("totalCents", tot[1]);
       set("pending", usd(d.earnings.pending));
@@ -574,7 +578,8 @@
     var token = params.get("token");
 
     function load() {
-      return fetch(dataOrigin() + "/embed/referrals", { headers: { Authorization: "Bearer " + token }, cache: "no-store" })
+      var query = linkId ? "?link_id=" + encodeURIComponent(linkId) : "";
+      return fetch(dataOrigin() + "/embed/referrals" + query, { headers: { Authorization: "Bearer " + token }, cache: "no-store" })
         .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
         .then(function (res) { if (!res || !res.data) throw new Error("empty response"); return res.data; });
     }

@@ -56,6 +56,8 @@ The token is public and short-lived, so it's safe to send to the browser. The co
 | `data` | `"referrals"` | `"referrals"` | Which embed to render. |
 | `theme` | `"light" \| "dark" \| "system"` | `"system"` | Follows the partner's OS setting by default. |
 | `themeOptions` | `ToltEmbedThemeOptions` | none | Recolor and reshape the widget to match your app. |
+| `linkId` | `string` | none | Show this link (`lnk_...`) instead of the partner's first one. Falls back to the first link if it isn't one of the partner's links. |
+| `hideLink` | `boolean` | `false` | Hide the referral link and copy button, for when your app already shows the link. |
 | `baseUrl` | `string` | `https://platform.tolt.com` | Point at a local host, or straight at a hosted `.html` file, during development. |
 | `onReady` | `() => void` | none | Fires once the dashboard has loaded. |
 | `onError` | `(message: string) => void` | none | Fires if the token is rejected. |
@@ -98,7 +100,7 @@ The token is public and short-lived, so it's safe to send to the browser. The co
 
 ## Not using React?
 
-Drop the iframe in directly. The same theme options are query parameters:
+Drop the iframe in directly. The same theme options are query parameters, and so are `linkId` and `hideLink=true`:
 
 ```html
 <iframe

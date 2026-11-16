@@ -39,6 +39,10 @@ export type ToltEmbedProps = {
   theme?: ToltEmbedTheme;
   /** Match the widget to your brand. */
   themeOptions?: ToltEmbedThemeOptions;
+  /** Show this link (`lnk_...`) instead of the partner's first one. Falls back to the first link if it isn't one of the partner's links. */
+  linkId?: string;
+  /** Hide the referral link and copy button, for when your app already shows the link. */
+  hideLink?: boolean;
   /** Override the embed host, or point straight at a hosted `.html` file (mostly for local development). */
   baseUrl?: string;
   className?: string;
@@ -69,6 +73,8 @@ export function ToltEmbed({
   data = "referrals",
   theme = "system",
   themeOptions,
+  linkId,
+  hideLink = false,
   baseUrl = DEFAULT_BASE_URL,
   className,
   style,
@@ -100,7 +106,7 @@ export function ToltEmbed({
   return (
     <iframe
       ref={iframeRef}
-      src={buildSrc(baseUrl, data, token, theme, themeOptions)}
+      src={buildSrc(baseUrl, data, token, theme, themeOptions, linkId, hideLink)}
       title="Tolt referral dashboard"
       className={className}
       allow="clipboard-write"
@@ -114,13 +120,17 @@ function buildSrc(
   data: string,
   token: string | undefined,
   theme: ToltEmbedTheme,
-  themeOptions?: ToltEmbedThemeOptions,
+  themeOptions: ToltEmbedThemeOptions | undefined,
+  linkId: string | undefined,
+  hideLink: boolean,
 ) {
   const trimmed = baseUrl.replace(/\/$/, "");
   const target = /\.html?(\?|#|$)/i.test(trimmed) ? trimmed : `${trimmed}/${data}`;
   const params = new URLSearchParams();
   if (token) params.set("token", token);
   if (theme !== "system") params.set("theme", theme);
+  if (linkId) params.set("linkId", linkId);
+  if (hideLink) params.set("hideLink", "true");
   if (themeOptions) {
     for (const key of THEME_KEYS) {
       const value = themeOptions[key];
